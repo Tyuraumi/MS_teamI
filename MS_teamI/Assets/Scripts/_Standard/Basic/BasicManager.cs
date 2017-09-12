@@ -11,7 +11,17 @@ abstract public class BasicManager : BasicScript
 {
 	#region serialize_variable
 	[SerializeField, Header("実行情報")]
-	List<BasicScript> _scriptList = new List<BasicScript>();
+	List<BasicScript> _scriptList = new List<BasicScript>();	// 操作情報
+	#endregion
+
+	#region property
+	protected List<BasicScript> ScriptList {
+
+		get {
+
+			return _scriptList;
+		}
+	}
 	#endregion
 
 	#region function

@@ -9,7 +9,8 @@ public static class ProjectDefine {
 	#region enum
 	public enum Fade {
 
-		BLACK = 0,	// 黒幕
+		NONE = 0,	// なし
+		BLACK,		// 黒幕
 	}
 	#endregion
 }

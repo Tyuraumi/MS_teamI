@@ -6,7 +6,7 @@
  * [ Author ]	SUZUKI YUZI
 */
 #endregion
-abstract public class BasicFade : MonoBehaviour {
+abstract public class BasicFade : BasicScript {
 
 	#region serialize_variable
 	[SerializeField, Header("[true]IN [false]OUT")]
@@ -17,5 +17,48 @@ abstract public class BasicFade : MonoBehaviour {
 
 	#region variable
 	private float _playTime = 0.0f;		// 実行時間
+	#endregion
+
+	#region property
+	public bool IsEnd {
+
+		get {
+			
+			return (_playTime >= _fadeTime);
+		}
+	}
+
+	protected float PlayPercent {
+
+		get {
+
+			return Mathf.Clamp01(_playTime / _fadeTime);
+		}
+	}
+	#endregion
+
+	#region function
+	// 実行準備
+	public override void Standby()
+	{
+		// 処理時間設定
+		_fadeTime = Mathf.Max(0.0f, _fadeTime);
+
+		// 実行時間初期化
+		_playTime = 0.0f;
+	}
+
+	// 実行
+	public override void Run()
+	{
+		// 時間更新
+		_playTime = Mathf.Min(_fadeTime, _playTime + Time.deltaTime);
+
+		// フェード実行
+		Fade();
+	}
+
+	// フェード実行
+	abstract protected void Fade();
 	#endregion
 }

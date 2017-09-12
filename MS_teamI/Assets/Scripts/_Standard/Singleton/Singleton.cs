@@ -37,31 +37,47 @@ abstract public class Singleton<T> : MonoBehaviour where T : Singleton<T> {
 	}
 	#endregion
 
+	#region property
+	private bool IsSingleton {
+
+		get {
+
+			return (_instance == null || _instance == this);
+		}
+	}
+	#endregion
+
 	#region function
 	// 準備
-	virtual protected void Awake()
+	private void Awake()
 	{
 		// シングルトンか確認
-		CheckInstance();
-	}
+		if(!IsSingleton) {
 
-	// 後更新
-	abstract protected void LateUpdate();
-
-	// シングルトン情報確認
-	protected bool CheckInstance()
-	{
-		// 異なる情報なら
-		if (_instance != null && _instance != this) {
-
-			// 自身を削除
+			// 削除
 			Destroy(gameObject);
-			return false;
+			return;
 		}
 
 		// 登録
 		_instance = (T)this;
-		return true;
+		DontDestroyOnLoad(gameObject);
+
+		// 実行準備
+		Standby();
 	}
+
+	// 最遅更新
+	private void LateUpdate()
+	{
+		// 実行
+		Run();
+	}
+
+	// 実行準備
+	abstract protected void Standby();
+
+	// 実行
+	abstract protected void Run();
 	#endregion
 }
