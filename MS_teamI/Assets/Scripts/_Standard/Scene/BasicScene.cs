@@ -13,10 +13,10 @@ public class BasicScene : BasicManager {
 	private void Awake()
 	{
 		// シーンマネージャ確認
-		if(SceneManager.Instance != null) {
+		if(ProjectSceneManager.Instance != null) {
 
 			// マネージャに登録
-			SceneManager.Instance.Entry(this);
+			ProjectSceneManager.Instance.EntryScene(this);
 		}
 	}
 	#endregion
