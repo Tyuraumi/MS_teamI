@@ -15,8 +15,14 @@ public static class ProjectDefine {
 
 	public enum SceneID {
 
-		NONE = 0,	// なし : 後に消す
+		NONE = 0,	// なし
 		TITLE,		// タイトル
+	}
+
+	public enum RunID {
+
+		SINGLE = 0,	// 単独実行
+		MULUTIPLE	// 複数実行
 	}
 	#endregion
 }

@@ -63,21 +63,11 @@ abstract public class Singleton<T> : MonoBehaviour where T : Singleton<T> {
 		_instance = (T)this;
 		DontDestroyOnLoad(gameObject);
 
-		// 実行準備
-		Standby();
+		// 初期化
+		Initialize();
 	}
 
-	// 最遅更新
-	private void LateUpdate()
-	{
-		// 実行
-		Run();
-	}
-
-	// 実行準備
-	abstract protected void Standby();
-
-	// 実行
-	abstract protected void Run();
+	// 初期化
+	abstract protected void Initialize();
 	#endregion
 }

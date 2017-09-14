@@ -9,7 +9,7 @@
 abstract public class BasicFade : BasicScript {
 
 	#region serialize_variable
-	[SerializeField, Header("[true]IN [false]OUT")]
+	[SerializeField, Header("切替種別 : [true]IN [false]OUT")]
 	bool _fadeMode = false;				// 実行状態
 	[SerializeField, Header("処理時間")]
 	float _fadeTime = 0.0f;				// フェード処理時間
@@ -28,7 +28,15 @@ abstract public class BasicFade : BasicScript {
 		}
 	}
 
-	protected float PlayPercent {
+	protected bool FadeMode {
+
+		get {
+
+			return _fadeMode;
+		}
+	}
+
+	virtual protected float PlayPercent {
 
 		get {
 
