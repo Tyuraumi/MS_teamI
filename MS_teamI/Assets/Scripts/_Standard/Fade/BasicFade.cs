@@ -6,53 +6,50 @@
  * [ Author ]	SUZUKI YUZI
 */
 #endregion
-abstract public class BasicFade : BasicScript {
+public abstract class BasicFade : BasicBehaviour {
 
 	#region serialize_variable
-	[SerializeField, Header("切替種別 : [true]IN [false]OUT")]
-	bool _fadeMode = false;				// 実行状態
+	[SerializeField, Header("フェード名")]
+	ProjectDefine.FadeID _fadeID = ProjectDefine.FadeID.NONE;	// フェード情報
 	[SerializeField, Header("処理時間")]
-	float _fadeTime = 0.0f;				// フェード処理時間
+	float _fadeTime = 0.0f;										// 処理時間
 	#endregion
 
 	#region variable
-	private float _playTime = 0.0f;		// 実行時間
+	private bool _fadeMode = false;								// 実行状態
+	private float _playTime = 0.0f;								// 実行時間
 	#endregion
 
 	#region property
-	public bool IsEnd {
+	public ProjectDefine.FadeID FadeID {
+
+		get {
+
+			return _fadeID;
+		}
+	}
+
+	public virtual bool IsEnd {
 
 		get {
 			
 			return (_playTime >= _fadeTime);
 		}
 	}
-
-	protected bool FadeMode {
-
-		get {
-
-			return _fadeMode;
-		}
-	}
-
-	virtual protected float PlayPercent {
-
-		get {
-
-			return Mathf.Clamp01(_playTime / _fadeTime);
-		}
-	}
 	#endregion
 
 	#region function
-	// 実行準備
-	public override void Standby()
+	// 起動
+	public override void Startup()
 	{
 		// 処理時間設定
 		_fadeTime = Mathf.Max(0.0f, _fadeTime);
+	}
 
-		// 実行時間初期化
+	// 準備
+	public override void Ready()
+	{
+		// 時間初期化
 		_playTime = 0.0f;
 	}
 
@@ -67,6 +64,6 @@ abstract public class BasicFade : BasicScript {
 	}
 
 	// フェード実行
-	abstract protected void Fade();
+	protected abstract void Fade();
 	#endregion
 }

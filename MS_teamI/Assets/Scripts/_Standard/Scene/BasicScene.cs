@@ -6,7 +6,7 @@
  * [ Author ]	SUZUKI YUZI
 */
 #endregion
-abstract public class BasicScene : BasicScript {
+abstract public class BasicScene : BasicBehaviour {
 
 	#region serialize_variable
 	[SerializeField, Header("シーン名")]
@@ -29,19 +29,6 @@ abstract public class BasicScene : BasicScript {
 		get {
 
 			return _runID;
-		}
-	}
-	#endregion
-
-	#region function
-	// 準備
-	private void Awake()
-	{
-		// シーンマネージャ確認
-		if(ProjectSceneManager.Instance != null) {
-
-			// マネージャに登録
-			ProjectSceneManager.Instance.EntryScene(this);
 		}
 	}
 	#endregion

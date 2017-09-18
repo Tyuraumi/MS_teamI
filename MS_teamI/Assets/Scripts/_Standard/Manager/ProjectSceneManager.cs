@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 #region Head
 /*
@@ -11,13 +12,6 @@ using UnityEngine.SceneManagement;
 public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 
 	#region private_class
-	[System.Serializable]
-	private class FadeObject {
-
-		public ProjectDefine.FadeID fadeID = ProjectDefine.FadeID.NONE;		// フェードID
-		public BasicFade script = null;										// 実行情報
-	}
-
 	private class FadeInfo {
 
 		public ProjectDefine.SceneID nextID = ProjectDefine.SceneID.NONE;	// 次シーン情報
@@ -29,20 +23,24 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 	#region serialize_variable
 	[SerializeField, Header("シーン切替情報")]
 	FadeInfo _fadeInfo = null;												// シーン切替用
-	[SerializeField, Header("フェード情報")]
-	List<FadeObject> _fadeList = new List<FadeObject>();					// 使用フェード
 	#endregion
 
 	#region variable
 	private Stack<BasicScene> _sceneList = new Stack<BasicScene>();			// 実行シーン
+	private List<BasicFade> _fadeList = new List<BasicFade>();				// 実行フェード
 	#endregion
 
 	#region function
-	// リセット
-	private void Reset()
+	// 初期化
+	protected override void Initialize()
 	{
-		// 初期化
-		Initialize();
+		// シーンが未登録なら
+		if (_sceneList.Count == 0) {
+
+			// シーンを取得して登録
+			BasicScene basicScene = FindObjectOfType<BasicScene>();
+			Apply(basicScene);
+		}
 	}
 
 	// 更新
@@ -52,7 +50,7 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 		if (_fadeInfo != null) {
 
 			// フェード処理
-			RunFade();
+			Fade();
 
 			// フェードが終了していなければ実行終了
 			if (_fadeInfo != null)
@@ -60,23 +58,29 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 		}
 
 		// シーン処理
-		RunScene();
+		Run();
 	}
 
-	// 初期化
-	protected override void Initialize()
+	// 有効化
+	public void Apply(BasicScene basicScene)
 	{
-		// シーンが未登録なら
-		if (_sceneList.Count == 0) {
+		// NULLチェック
+		if (basicScene == null)
+			return;
 
-			// シーンを取得して登録
-			BasicScene basicScene = FindObjectOfType<BasicScene>();
-			EntryScene(basicScene);
-		}
+		// 重複確認
+		if (_sceneList.Contains(basicScene))
+			return;
+
+		// シーン準備
+		basicScene.Startup();
+
+		// 追加
+		_sceneList.Push(basicScene);
 	}
 
-	// フェード実行
-	private void RunFade()
+	// フェード
+	private void Fade()
 	{
 		// フェードアウト情報があれば
 		if (_fadeInfo.fadeOut != null) {
@@ -116,8 +120,8 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 		_fadeInfo = null;
 	}
 
-	// シーン実行
-	private void RunScene()
+	// 実行
+	private void Run()
 	{
 		// シーン情報があれば
 		if (_sceneList.Count > 0) {
@@ -129,7 +133,7 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 				BasicScene scene = _sceneList.Pop();
 
 				// 前シーン実行
-				RunScene();
+				Run();
 
 				// 復元
 				_sceneList.Push(scene);
@@ -141,21 +145,39 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 	}
 
 	// シーン登録
-	public void EntryScene(BasicScene basicScene)
+	public void EntryScene(ProjectDefine.SceneID sceneID)
 	{
-		// NULLチェック
-		if (basicScene == null)
-			return;
-
 		// 重複確認
-		if (_sceneList.Contains(basicScene))
+		if (_sceneList.Any(scene => scene.SceneID == sceneID))
 			return;
 
-		// シーン準備
-		basicScene.Standby();
+		// シーン作成
+		LoadScene(sceneID, LoadSceneMode.Additive);
+	}
 
-		// 追加
-		_sceneList.Push(basicScene);
+	// シーン削除
+	public void RemoveScene(ProjectDefine.SceneID sceneID)
+	{
+		// 一時変数作成
+		Stack<BasicScene> backupList = new Stack<BasicScene>();
+		
+		// 選択シーン削除
+		while(_sceneList.Count > 0) {
+
+			// 退避
+			BasicScene basicScene = _sceneList.Pop();
+
+			// 選択シーン以外なら
+			if (basicScene.SceneID == sceneID || backupList.Count == 0 ) {
+
+				// 確保
+				backupList.Push(basicScene);
+			}
+		}
+
+		// シーン再構成
+		backupList.Reverse();
+		_sceneList.CopyTo(backupList.ToArray(), backupList.Count);
 	}
 
 	// シーン切替
@@ -173,39 +195,32 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 
 		// 切替情報作成
 		_fadeInfo = new FadeInfo();
-		_fadeInfo.nextID = sceneID;
 
 		// フェード情報取得
 		for(int i = 0; i < _fadeList.Count; i ++) {
 
 			// フェードイン情報の登録
-			if (fadeInID == _fadeList[i].fadeID)
-				_fadeInfo.fadeIn = _fadeList[i].script;
+			if (fadeInID == _fadeList[i].FadeID) {
+
+				_fadeInfo.fadeIn = _fadeList[i];
+			}
 
 			// フェードアウト情報の登録
-			if (fadeInID == _fadeList[i].fadeID)
-				_fadeInfo.fadeOut = _fadeList[i].script;
+			if (fadeInID == _fadeList[i].FadeID)
+				_fadeInfo.fadeOut = _fadeList[i];
 
-			// フェード情報の取得が終わったら処理を抜ける
-			if (_fadeInfo.fadeIn != null && _fadeInfo.fadeOut != null)
+			// フェード情報の取得が終わったら
+			if (_fadeInfo.fadeIn != null && _fadeInfo.fadeOut != null) {
+
+				// 次シーンを登録して終了
+				_fadeInfo.nextID = sceneID;
 				return;
+			}
 		}
 
 		// フェード情報の取得に失敗
 		_fadeInfo.fadeIn = null;
 		_fadeInfo.fadeOut = null;
-	}
-
-	// シーン名取得
-	private string ConvertSceneName(ProjectDefine.SceneID sceneID)
-	{
-		// シーン名初期化
-		string sceneName = "";
-
-		// TODO : シーン名取得
-
-		// シーン名を返す
-		return sceneName;
 	}
 
 	// シーン読込
@@ -216,6 +231,25 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 
 		// シーン切替
 		SceneManager.LoadScene(sceneName, sceneMode);
+	}
+
+	// シーン名取得
+	private string ConvertSceneName(ProjectDefine.SceneID sceneID)
+	{
+		// シーン名初期化
+		string sceneName = "";
+
+		// シーン名取得
+		switch(sceneID) {
+
+			default:
+			case ProjectDefine.SceneID.TITLE:
+				// TODO
+				break;
+		}
+
+		// シーン名を返す
+		return sceneName;
 	}
 	#endregion
 }
