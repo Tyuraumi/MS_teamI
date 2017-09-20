@@ -15,40 +15,23 @@ using System.Reflection;
 #endregion
 public class ProjectSettingsCreator : AssetPostProcesserEx {
 
-	#region class
-	private class SceneData : ScriptableObject {
-
-		#region class
-		[System.SerializableAttribute]
-		public class Param {
-
-			public int No;			// シーン番号
-			public string Name;		// シーン名
-		}
-		#endregion
-
-		#region variable
-		public List<Param> list = new List<Param>();	// シーン情報
-		#endregion
-	}
-	#endregion
-
-	#region variable
+	#region const_variable
 	private const string TARGET_DIRECTORY_NAME = "ProjectSettings";		// 監視ディレクトリ
-	private const string COMMAND_NAME = "Tools/Create/Setting Class";   // コマンド名
 	#endregion
 
-	#region function
+	#region static_function
 	// 監視ディレクトリに変更があれば自動実行
 	private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
 	{
 		// 確認情報
-		List<string[]> assetsList = new List<string[]>(){
+		List<string[]> assetsList = new List<string[]>() {
+
 			importedAssets
 		};
 
 		// 監視ディレクトリ
-		List<string> targetDirectoryNameList = new List<string>(){
+		List<string> targetDirectoryNameList = new List<string>() {
+
 			TARGET_DIRECTORY_NAME
 		};
 
@@ -61,6 +44,7 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 	}
 
 	// 作成
+	[MenuItem("Tools/CreateConstants #p")]
 	public static void Create()
 	{
 		// タグ作成
@@ -74,6 +58,9 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 
 		//ソーティングレイヤー情報作成
 		CreateSortingLayer();
+
+		// デバッグメッセージ表示
+		Debug.Log("Complete execution [CreateConstants]");
 	}
 
 	// タグ情報作成
@@ -83,7 +70,8 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 		Dictionary<string, string> tagDictionary = InternalEditorUtility.tags.ToDictionary(value => value);
 
 		// スクリプト作成
-		ConstantsCreator.Create("TagName", "タグ名クラス", tagDictionary);
+		ConstantsNameCreator<string> nameCreator = new ConstantsNameCreator<string>();
+		nameCreator.Create("TagName", "タグ名クラス", tagDictionary);
 	}
 
 	// シーン情報作成
@@ -100,18 +88,20 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 		}
 
 		// スクリプト作成
-		ConstantsCreator.Create("SceneName", "シーン名クラス", scenesNameDictionary);
-		ConstantsCreator.Create("SceneNo", "シーン番号クラス", scenesNoDictionary);
+		ConstantsNameCreator<string> nameCreator = new ConstantsNameCreator<string>();
+		nameCreator.Create("SceneName", "シーン名クラス", scenesNameDictionary);
+		ConstantsEnumCreator<int> enumCreator = new ConstantsEnumCreator<int>();
+		enumCreator.Create("SceneEnum", "シーン番号クラス", scenesNoDictionary);
 
 		// シーンデータ書出し
 		{
 			// ファイル情報設定
-			string dataPath = "Assets/Resources/SceneData.asset";
+			string dataPath = DirectoryPath.ResourcePath + FileName.SceneDataFile + Extension.AssetUnity;
 
 			//SceneDataを新規作成、既にあるものは削除
 			SceneData data = ScriptableObject.CreateInstance<SceneData>();
 			AssetDatabase.DeleteAsset(dataPath);
-			AssetDatabase.CreateAsset((ScriptableObject)data, dataPath);
+			AssetDatabase.CreateAsset(data, dataPath);
 
 			data.hideFlags = HideFlags.NotEditable;
 
@@ -138,10 +128,11 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 		
 		// レイヤーマスク番号取得
 		Dictionary<string, int> layerMaskNoDictionary = InternalEditorUtility.layers.ToDictionary(layer => layer, layer => 1 << LayerMask.NameToLayer(layer));
-		
+
 		// スクリプト作成
-		ConstantsCreator.Create("LayerNo", "レイヤー番号クラス", layerNoDictionary);
-		ConstantsCreator.Create("LayerMaskNo", "レイヤーマスク番号クラス", layerMaskNoDictionary);
+		ConstantsEnumCreator<int> enumCreator = new ConstantsEnumCreator<int>();
+		enumCreator.Create("LayerEnum", "レイヤー番号クラス", layerNoDictionary);
+		enumCreator.Create("LayerMaskEnum", "レイヤーマスク番号クラス", layerMaskNoDictionary);
 	}
 
 	// ソーティングレイヤー情報作成
@@ -159,7 +150,8 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 		Dictionary<string, string> sortingLayerDictionary = sortingLayerName.ToDictionary(value => value);
 
 		// スクリプト作成
-		ConstantsCreator.Create("SortingLayerName", "ソーティングレイヤー名クラス", sortingLayerDictionary);
+		ConstantsNameCreator<string> nameCreator = new ConstantsNameCreator<string>();
+		nameCreator.Create("SortingLayerName", "ソーティングレイヤー名クラス", sortingLayerDictionary);
 	}
 	#endregion
 }

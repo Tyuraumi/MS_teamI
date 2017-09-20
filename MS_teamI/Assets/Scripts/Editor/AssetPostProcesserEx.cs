@@ -10,7 +10,7 @@ using System.Linq;
 #endregion
 public class AssetPostProcesserEx : AssetPostprocessor {
 
-	#region function
+	#region static_function
 	// 特定ディレクトリ内の特定ファイルを検出
 	protected static bool ExistsDirectoryInAssets(List<string[]> assetsList, List<string> targetDirectoryNameList)
 	{

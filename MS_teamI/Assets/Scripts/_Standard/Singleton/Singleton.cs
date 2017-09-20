@@ -15,41 +15,50 @@ abstract public class Singleton<T> : MonoBehaviour where T : Singleton<T> {
 	#region static_property
 	public static T Instance
 	{
-		get
-		{
+		get {
+
+			// インスタンス確認
+			if (_instance == null) {
+
+				// 情報探索
+				_instance = (T)FindObjectOfType(typeof(T));
+
+				// 探索に失敗したらメッセージ表示
+				if (_instance == null)
+					Debug.LogError(typeof(T) + " is Nothing.");
+			}
+
 			return _instance;
 		}
 	}
 	#endregion
 
 	#region function
-	// リセット
-	private void Reset()
-	{
-		// 既にシングルトン化していたら処理しない
-		if (_instance != null)
-			return;
-
-		// 実体登録
-		_instance = (T)this;
-
-		// 初期化
-		Initialize();
-	}
-
 	// 準備
 	private void Awake()
 	{
-		// シングルトンでなければ
-		if(_instance != this) {
+		// まだインスタンスが登録されていなければ
+		if (_instance == null) {
 
-			// 削除
-			Destroy(gameObject);
-			return;
+			// インスタンス登録
+			_instance = (T)this;
+		}
+		else {
+
+			// インスタンスと異なっていれば
+			if(_instance != this) {
+
+				// 削除
+				Destroy(gameObject);
+				return;
+			}
 		}
 
-		// シーン間で保持
+		// シーン間引継設定
 		DontDestroyOnLoad(gameObject);
+
+		// 初期化
+		Initialize();
 	}
 
 	// 初期化

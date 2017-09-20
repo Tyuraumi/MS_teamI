@@ -7,18 +7,6 @@
 public static class ProjectDefine {
 
 	#region enum
-	public enum FadeID {
-
-		NONE = 0,	// なし
-		BLACK,		// 黒幕
-	}
-
-	public enum SceneID {
-
-		NONE = 0,	// なし
-		TITLE,		// タイトル
-	}
-
 	public enum RunID {
 
 		SINGLE = 0,	// 単独実行
