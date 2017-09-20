@@ -6,4 +6,6 @@
 #endregion
 public static class SceneName {
 
+	#region const_variable
+	#endregion
 }

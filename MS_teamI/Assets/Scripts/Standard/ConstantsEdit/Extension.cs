@@ -6,13 +6,13 @@
 #endregion
 public static class Extension {
 
-	#region variable
-	private static string _cSharp = ".cs";			// C#
-	private static string _assetUnity = ".asset";	// UnityAsset
-	private static string _csv = ".csv";			// CSV
+	#region const_variable
+	private const string _cSharp = ".cs";			// C#
+	private const string _assetUnity = ".asset";	// UnityAsset
+	private const string _csv = ".csv";				// CSV
 	#endregion
 
-	#region property
+	#region static_property
 	public static string CSharp {
 
 		get {

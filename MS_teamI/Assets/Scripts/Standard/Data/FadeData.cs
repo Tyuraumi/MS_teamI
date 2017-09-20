@@ -10,8 +10,8 @@ using System.Collections.Generic;
 public class FadeData {
 
 	#region variable
-	public SceneEnum.ID nextID = SceneEnum.ID.NONE;	// 次シーン情報
-	public BasicFade fadeIn = null;					// フェードイン情報
+	public SceneEnum.ID nextID = SceneEnum.ID.NONE; // 次シーン情報
 	public BasicFade fadeOut = null;				// フェードアウト情報
+	public BasicFade fadeIn = null;					// フェードイン情報
 	#endregion
 }

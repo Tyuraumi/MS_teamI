@@ -35,11 +35,26 @@ public class ConstantsNameCreator<T> : ConstantsCreator<T> {
 		return false;
 	}
 
+	// クラス上部作成
+	protected override void CreateClassOpening()
+	{
+		// 基底呼出
+		base.CreateClassOpening();
+
+		// region開始
+		_stringBuilder.Append("\t").AppendLine("#region const_variable");
+	}
+
+
 	// 定数作成
 	protected override void CreateConstants()
 	{
-		// 変数の最長を求める
-		int keyLengthMax = 1 + _dictionary.Keys.Select(key => key.Length).Max();
+		// 定数がなければ処理しない
+		if (_dictionary.Count == 0)
+			return;
+
+			// 変数の最長を求める
+			int keyLengthMax = 1 + _dictionary.Keys.Select(key => key.Length).Max();
 
 		// 定数の書出し
 		foreach (KeyValuePair<string, T> valuePair in _dictionary) {
@@ -73,6 +88,16 @@ public class ConstantsNameCreator<T> : ConstantsCreator<T> {
 					break;
 			}
 		}
+	}
+
+	// クラス下部作成
+	protected override void CreateClassEnding()
+	{
+		// region終了
+		_stringBuilder.Append("\t").AppendLine("#endregion");
+
+		// 基底呼出
+		base.CreateClassEnding();
 	}
 	#endregion
 }

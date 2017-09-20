@@ -32,11 +32,20 @@ public class ConstantsEnumCreator<T> : ConstantsCreator<T> {
 		return false;
 	}
 
+	// クラス上部作成
+	protected override void CreateClassOpening()
+	{
+		// 基底呼出
+		base.CreateClassOpening();
+
+		// region開始
+		_stringBuilder.Append("\t").AppendLine("#region enum");
+	}
+
 	// 定数作成
 	protected override void CreateConstants()
 	{
 		// 列挙型名を入力
-		_stringBuilder.Append("\t").AppendLine("#region enum");
 		_stringBuilder.Append("\t").Append("public enum ID ").AppendLine("{");
 		_stringBuilder.AppendLine();
 
@@ -65,7 +74,16 @@ public class ConstantsEnumCreator<T> : ConstantsCreator<T> {
 
 		// 列挙型を閉じる
 		_stringBuilder.Append("\t").AppendLine("}");
+	}
+
+	// クラス下部作成
+	protected override void CreateClassEnding()
+	{
+		// region終了
 		_stringBuilder.Append("\t").AppendLine("#endregion");
+
+		// 基底呼出
+		base.CreateClassEnding();
 	}
 	#endregion
 }

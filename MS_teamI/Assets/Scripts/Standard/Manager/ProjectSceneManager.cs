@@ -79,6 +79,10 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 
 				// フェードアウト情報削除
 				_fadeData.fadeOut = null;
+
+				// フェードイン実行準備
+				_fadeData.fadeIn.FadeMode = FadeEnum.Mode.IN;
+				_fadeData.fadeIn.Ready();
 			}
 
 			// 処理を抜ける
@@ -184,16 +188,20 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 		// フェード情報取得
 		for(int i = 0; i < _fadeList.Count; i ++) {
 
-			// フェードイン情報の登録
-			if (fadeInID == _fadeList[i].FadeID)
-				_fadeData.fadeIn = _fadeList[i];
-
 			// フェードアウト情報の登録
 			if (fadeOutID == _fadeList[i].FadeID)
 				_fadeData.fadeOut = _fadeList[i];
 
+			// フェードイン情報の登録
+			if (fadeInID == _fadeList[i].FadeID)
+				_fadeData.fadeIn = _fadeList[i];
+
 			// フェード情報の取得が終わったら
-			if (_fadeData.fadeIn != null && _fadeData.fadeOut != null) {
+			if (_fadeData.fadeOut != null && _fadeData.fadeIn != null) {
+
+				// フェードアウト実行準備
+				_fadeData.fadeOut.FadeMode = FadeEnum.Mode.OUT;
+				_fadeData.fadeOut.Ready();
 
 				// 次シーンを登録して終了
 				_fadeData.nextID = sceneID;

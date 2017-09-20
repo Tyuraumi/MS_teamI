@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
@@ -33,7 +32,7 @@ public abstract class ConstantsCreator<T> {
 	#endregion
 
 	#region readonly_variable
-	protected readonly string _saveDirectory = "Assets/Scripts/_Standard/Constants/";	// 保存パス
+	protected readonly string _saveDirectory = "Assets/Scripts/Standard/Constants/";	// 保存パス
 	private readonly char _delimiter = '_';												// 区切り文字
 	private readonly string[] _invaludChars =											// 無効文字
 	{

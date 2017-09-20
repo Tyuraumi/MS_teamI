@@ -6,8 +6,8 @@
 #endregion
 public static class DirectoryPath {
 
-	#region static_variable
-	private static string _resourcePath = "Assets/Resources/";	// Resources
+	#region const_variable
+	private const string _resourcePath = "Assets/Resources/";	// Resources
 	#endregion
 
 	#region static_property

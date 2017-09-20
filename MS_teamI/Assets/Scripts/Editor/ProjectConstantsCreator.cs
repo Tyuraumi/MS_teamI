@@ -44,7 +44,7 @@ public class ProjectSettingsCreator : AssetPostProcesserEx {
 	}
 
 	// 作成
-	[MenuItem("Tools/CreateConstants #p")]
+	[MenuItem("Tools/CreateConstants &p")]
 	public static void Create()
 	{
 		// タグ作成

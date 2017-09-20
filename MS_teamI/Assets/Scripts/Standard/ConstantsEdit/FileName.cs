@@ -6,8 +6,8 @@
 #endregion
 public static class FileName {
 
-	#region static_variable
-	private static string _sceneDataFile = "SceneData";		// シーン情報名
+	#region const_variable
+	private const string _sceneDataFile = "SceneData";		// シーン情報名
 	#endregion
 
 	#region static_property

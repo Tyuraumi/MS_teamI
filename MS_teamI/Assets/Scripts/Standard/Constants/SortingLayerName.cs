@@ -6,5 +6,7 @@
 #endregion
 public static class SortingLayerName {
 
+	#region const_variable
 	public const string DEFAULT = "Default";
+	#endregion
 }

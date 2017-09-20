@@ -4,10 +4,4 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 2b084211c5911b84abad98a404ff367f
-  - enabled: 1
-    path: Assets/Scenes/yuzi/StandardScript.unity
-    guid: 37c23ab53523efe4f8c40bdae520935a
+  m_Scenes: []

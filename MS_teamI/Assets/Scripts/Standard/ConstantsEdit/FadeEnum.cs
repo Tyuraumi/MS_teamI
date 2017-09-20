@@ -10,7 +10,13 @@ public static class FadeEnum {
 	public enum ID {
 
 		NONE = 0,	// なし
-		BLACK		// 黒幕
+		IMAGE		// 画像
+	}
+
+	public enum Mode {
+
+		IN = 0,		// 
+		OUT			//
 	}
 	#endregion
 }
