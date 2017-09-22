@@ -26,7 +26,6 @@ public class ImageFade : BasicFade {
 			return base.PlayPercent;
 		}
 	}
-
 	#endregion
 
 	#region function

@@ -32,4 +32,13 @@ abstract public class BasicScene : BasicBehaviour {
 		}
 	}
 	#endregion
+
+	#region function
+	// 初期化
+	private void Awake()
+	{
+		// シーン登録
+		ProjectSceneManager.Instance.Apply(this);
+	}
+	#endregion
 }

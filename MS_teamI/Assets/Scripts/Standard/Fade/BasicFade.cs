@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 #region Head
 /*
@@ -10,15 +11,15 @@ public abstract class BasicFade : BasicBehaviour {
 
 	#region serialize_variable
 	[SerializeField, Header("フェード名")]
-	FadeEnum.ID _fadeID = FadeEnum.ID.NONE;			// フェード情報
-	[SerializeField, Header("実行方法")]
-	FadeEnum.Mode _fadeMode = FadeEnum.Mode.OUT;	// 実行状態
-	[SerializeField, Header("処理時間")]
-	float _fadeTime = 0.0f;							// 処理時間
+	FadeEnum.ID _fadeID = FadeEnum.ID.NONE;					// フェード情報
+	[SerializeField, Header("標準処理時間")]
+	float _defaultFadeTime = 0.0f;							// 標準処理時間
 	#endregion
 
 	#region variable
-	private float _playTime = 0.0f;					// 実行時間
+	private Queue<float> _fadeTime = new Queue<float>();	// フェード時間
+	private FadeEnum.Mode _fadeMode = FadeEnum.Mode.OUT;	// 実行状態
+	private float _playTime = 0.0f;							// 実行時間
 	#endregion
 
 	#region property
@@ -42,12 +43,31 @@ public abstract class BasicFade : BasicBehaviour {
 			_fadeMode = value;
 		}
 	}
+	
+	public float FadeTime {
+
+		protected get {
+
+			if (_fadeTime.Count == 0)
+				return _defaultFadeTime;
+
+			return _fadeTime.Peek();
+		}
+
+		set {
+
+			if (value <= 0.0f)
+				return;
+
+			_fadeTime.Enqueue(value);
+		}
+	}
 
 	public virtual bool IsEnd {
 
 		get {
 			
-			return (_playTime >= _fadeTime);
+			return (_playTime >= FadeTime);
 		}
 	}
 
@@ -55,7 +75,7 @@ public abstract class BasicFade : BasicBehaviour {
 
 		get {
 
-			return (_playTime / _fadeTime);
+			return (_playTime / FadeTime);
 		}
 	}
 	#endregion
@@ -64,13 +84,20 @@ public abstract class BasicFade : BasicBehaviour {
 	// 起動
 	public override void Startup()
 	{
-		// 処理時間設定
-		_fadeTime = Mathf.Max(0.0f, _fadeTime);
+		// 標準処理時間設定
+		_defaultFadeTime = Mathf.Max(0.0f, _defaultFadeTime);
 	}
 
 	// 準備
 	public override void Ready()
 	{
+		// 前回使用していれば
+		if(_playTime > 0.0f) {
+
+			// 時間情報破棄
+			_fadeTime.Dequeue();
+		}
+
 		// 時間初期化
 		_playTime = 0.0f;
 	}
@@ -79,7 +106,7 @@ public abstract class BasicFade : BasicBehaviour {
 	public override void Run()
 	{
 		// 時間更新
-		_playTime = Mathf.Min(_fadeTime, _playTime + Time.deltaTime);
+		_playTime = Mathf.Min(FadeTime, _playTime + Time.deltaTime);
 
 		// フェード実行
 		Fade();

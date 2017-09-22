@@ -14,8 +14,8 @@ public class SceneData : ScriptableObject {
 	public class Param {
 
 		#region variable
-		public int No = 0;				// シーン番号
-		public string Name = "";		// シーン名
+		public int No = 0;							// シーン番号
+		public string Name = "";					// シーン名
 		#endregion
 	}
 	#endregion
