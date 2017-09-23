@@ -4,4 +4,13 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/yuzi/TestScene01.unity
+    guid: 6c1878d1e533242458389c7013573d02
+  - enabled: 1
+    path: Assets/Scenes/yuzi/TestScene02.unity
+    guid: f9ea1623b2e85fd45b7f275d87654544
+  - enabled: 1
+    path: Assets/Scenes/yuzi/TestScene03.unity
+    guid: 1983b9b3e80e734478e34ffcedbff2b8
