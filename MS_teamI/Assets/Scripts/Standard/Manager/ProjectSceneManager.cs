@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 using System.Linq;
 
 #region Head
@@ -32,6 +33,9 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 	// 初期化
 	protected override void Initialize()
 	{
+		// イベントシステム作成
+		CreateEventSystem();
+
 		// シーンデータ取得
 		_sceneData = Resources.Load<SceneData>(FileName.SceneDataFile);
 
@@ -114,6 +118,9 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 			// フェードインが終わったら
 			if (_fadeData.FadeIn.IsEnd) {
 
+				// イベントシステム作成
+				CreateEventSystem();
+
 				// フェード終了
 				_fadeData = null;
 			}
@@ -162,13 +169,17 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 	// シーン削除
 	public void RemoveScene(SceneEnum.ID sceneID)
 	{
+		// 選択シーンが存在しなければ処理しない
+		if (!_sceneList.Any(scene => scene.SceneID == sceneID))
+			return;
+
+		// シーン情報が１つしかなければ処理しない
+		if (_sceneList.Count == 1)
+			return;
+
 		// 一時変数作成
 		Stack<BasicScene> backupList = new Stack<BasicScene>();
 
-		// 削除確認用
-		int sceneCount = _sceneList.Count;
-		bool remove = false;
-		
 		// 選択シーン削除
 		while(_sceneList.Count > 0) {
 
@@ -176,10 +187,15 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 			BasicScene basicScene = _sceneList.Pop();
 
 			// 選択シーンなら
-			if (basicScene.SceneID == sceneID && sceneCount > 0) {
+			if (basicScene.SceneID == sceneID) {
 
-				// 削除通知
-				remove = true;
+				// シーン名の取得
+				string sceneName = "";
+				if (!ConvertScene(sceneID, out sceneName))
+					return;
+
+				// シーン削除
+				SceneManager.UnloadSceneAsync(sceneName);
 				break;
 			}
 
@@ -190,39 +206,21 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 		// シーン再構成
 		while (backupList.Count > 0)
 			_sceneList.Push(backupList.Pop());
-
-		// 削除確認
-		if (!remove)
-			return;
-
-		// シーン名の取得
-		string sceneName = "";
-		if (!ConvertScene(sceneID, out sceneName))
-			return;
-
-		// シーン削除
-		SceneManager.UnloadSceneAsync(sceneName);
 	}
 
 	// シーン切替
 	public void ChangeScene(SceneChangeData changeData)
 	{
-		// フェード中は処理しない
-		if (IsFade)
-			return;
-
-		// NULLチェック
-		if (changeData == null)
+		// フェード中、または情報がなければ処理しない
+		if (IsFade || changeData == null)
 			return;
 
 		// シーン情報初期化
 		_sceneList.Clear();
-
-		// フェード情報作成
-		_fadeData = new FadeData();
-
+		
 		// フェード情報取得
-		foreach(BasicFade fadeInfo in _fadeList) {
+		_fadeData = new FadeData();
+		foreach (BasicFade fadeInfo in _fadeList) {
 
 			// フェードアウト情報の登録
 			if (changeData.FadeOutID == fadeInfo.FadeID)
@@ -268,21 +266,34 @@ public class ProjectSceneManager : Singleton<ProjectSceneManager> {
 	// シーン情報変換
 	private bool ConvertScene(SceneEnum.ID sceneID, out string sceneName)
 	{
-		// シーン情報探索
+		// シーン名初期化
 		sceneName = "";
-		for (int i = 0; i < _sceneData.list.Count; i++) {
 
-			// 番号確認
-			if (_sceneData.list[i].No != (int)sceneID)
-				continue;
+		// シーン情報探索
+		SceneData.Param sceneData = _sceneData.list.FirstOrDefault(scene => scene.No == (int)sceneID);
 
-			// シーン名取得
-			sceneName = _sceneData.list[i].Name;
-			break;
-		}
+		// 利用できないシーン情報なら失敗
+		if (sceneData == null)
+			return false;
 
-		// 取得結果を返す
-		return (sceneName != "");
+		// シーン名取得
+		sceneName = sceneData.Name;
+		return true;
+	}
+
+	// イベントシステム作成
+	private void CreateEventSystem()
+	{
+		// イベントシステムが存在するなら処理しない
+		if (EventSystem.current != null)
+			return;
+
+		// イベントシステム作成
+		GameObject eventObject = new GameObject(FileName.EventSystemFile);
+		EventSystem.current = eventObject.AddComponent<EventSystem>();
+
+		// 入力モジュール作成
+		eventObject.AddComponent<StandaloneInputModule>();
 	}
 	#endregion
 }
