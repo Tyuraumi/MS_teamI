@@ -32,9 +32,9 @@ public abstract class ConstantsCreator<T> {
 	#endregion
 
 	#region readonly_variable
-	protected readonly string _saveDirectory = "Assets/Scripts/Standard/Constants/";	// 保存パス
-	private readonly char _delimiter = '_';												// 区切り文字
-	private readonly string[] _invaludChars =											// 無効文字
+	protected readonly string _saveDirectory =  DirectoryPath.ScriptPath + "Standard/Constants/";	// 保存パス
+	private readonly char _delimiter = '_';			// 区切り文字
+	private readonly string[] _invaludChars =		// 無効文字
 	{
 		" ", "!", "\"", "#", "$",
 		"%", "&", "\'", "(", ")",
@@ -50,31 +50,13 @@ public abstract class ConstantsCreator<T> {
 	protected ValueData _valueData = null;				// 利用型情報
 	protected StringBuilder _stringBuilder = null;		// ファイル情報
 	private string _className = "";						// 作成クラス名
-	private string _classInfo = "";						// 作成クラス説明文
+	private string _classOverView = "";					// 作成クラス概要
 	protected Dictionary<string, T> _dictionary = null;	// 利用定数情報
-	#endregion
-
-	#region property
-	protected string ClassName {
-
-		get {
-
-			return _className;
-		}
-	}
-
-	protected string ClassInfo {
-
-		get {
-
-			return _classInfo;
-		}
-	}
 	#endregion
 
 	#region function
 	// 作成
-	public void Create(string className, string classInfo, Dictionary<string, T> valueDictionary)
+	public void Create(string className, string classOverView, Dictionary<string, T> valueDictionary)
 	{
 		// 型情報作成
 		CreateValueData();
@@ -86,9 +68,8 @@ public abstract class ConstantsCreator<T> {
 		// ファイル情報初期化
 		_stringBuilder = new StringBuilder();
 
-		// 変数登録
-		_className = className;
-		_classInfo = classInfo;
+		// 変数作成
+		ConvertClassString(className, classOverView, out _className, out _classOverView);
 
 		// 定数最適化
 		CompactString(valueDictionary, out _dictionary);
@@ -133,6 +114,9 @@ public abstract class ConstantsCreator<T> {
 			return;
 		}
 	}
+
+	// クラス用文字列作成
+	protected abstract void ConvertClassString(string nameIn, string overviewIn, out string nameOut, out string overviewOut);
 
 	// 型情報利用確認
 	protected abstract bool CheckValueType();
@@ -224,7 +208,7 @@ public abstract class ConstantsCreator<T> {
 		// コメント入力
 		_stringBuilder.AppendLine("#region Head");
 		_stringBuilder.AppendLine("/*");
-		_stringBuilder.Append(" * [OverView]").Append("\t").AppendLine(_classInfo);
+		_stringBuilder.Append(" * [OverView]").Append("\t").AppendLine(_classOverView);
 		_stringBuilder.Append(" * [ Author ]").Append("\t").AppendLine("SUZUKI YUZI");
 		_stringBuilder.AppendLine("*/");
 		_stringBuilder.AppendLine("#endregion");

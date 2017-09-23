@@ -8,6 +8,7 @@ public static class FileName {
 
 	#region const_variable
 	private const string _sceneDataFile = "SceneData";		// シーン情報名
+	private const string _soundDataFile = "SoundData";		// 音情報名
 	private const string _eventSystemFile = "EventSystem";	// イベントシステム名
 	#endregion
 
@@ -17,6 +18,14 @@ public static class FileName {
 		get {
 
 			return _sceneDataFile;
+		}
+	}
+
+	public static string SoundDataFile {
+
+		get {
+
+			return _soundDataFile;
 		}
 	}
 

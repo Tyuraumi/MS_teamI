@@ -32,6 +32,16 @@ public class ConstantsEnumCreator<T> : ConstantsCreator<T> {
 		return false;
 	}
 
+	// クラス用文字列作成
+	protected override void ConvertClassString(string nameIn, string overviewIn, out string nameOut, out string overviewOut)
+	{
+		// クラス名作成
+		nameOut = nameIn + "Enum";
+
+		// クラス概要作成
+		overviewOut = overviewIn + "番号クラス";
+	}
+
 	// クラス上部作成
 	protected override void CreateClassOpening()
 	{
