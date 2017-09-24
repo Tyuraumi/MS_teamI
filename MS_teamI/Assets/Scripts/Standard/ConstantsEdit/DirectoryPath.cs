@@ -10,6 +10,7 @@ public static class DirectoryPath {
 	private const string _projectSettingPath = "ProjectSettings";	// ProjectSettings
 	private const string _resourcePath = "Assets/Resources/";		// Resources
 	private const string _scriptPath = "Assets/Scripts/";			// Scripts
+	private const string _csvPath = "CSV/";							// CSV
 	private const string _bgmPath = "Sound/BGM/";					// BGM
 	private const string _sePath = "Sound/SE/";						// SE
 	#endregion
@@ -36,6 +37,14 @@ public static class DirectoryPath {
 		get {
 
 			return _scriptPath;
+		}
+	}
+
+	public static string CSVPath {
+
+		get {
+
+			return _csvPath;
 		}
 	}
 
